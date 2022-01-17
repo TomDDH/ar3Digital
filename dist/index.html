@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>3Digital WebAR demo</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"></script> -->
+    <script type="module"  src="threeDigital.min.js"></script>
+  </head>
+
+  <style>
+#ar-button{
+font-size: 2em;
+}
+
+  </style>
+  <body>
+    <h1>3Digital WebAR demo</h1>
+    <p>tap Enter AR to start</p>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+
+
+
+    <three-digital-ar
+      glb-src="./assets/speaker.glb"
+      ios-src="./assets/speaker.usdz"
+      auto-rotate
+      environment-hdr = "https://onestopar.s3.dualstack.us-east-2.amazonaws.com/hdri/photo_studio_01_2k.hdr"
+    >
+    <button id="ar-button" slot="ar-button">Enter AR</button>
+</three-digital-ar>
+
+  </body>
+</html>
