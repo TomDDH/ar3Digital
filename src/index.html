@@ -7,7 +7,8 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"></script>
+    <script type="module" src="index.js"></script>
 
   </head>
 
@@ -28,13 +29,13 @@ font-size: 2em;
 
 
     <three-digital-ar
-      glb-src="./assets/speaker.glb"
+      glb-src="./assets/robot_v2.glb"
       ios-src="./assets/speaker.usdz"
-      auto-rotate
+      auto-rotates
       environment-hdr = "https://onestopar.s3.dualstack.us-east-2.amazonaws.com/hdri/photo_studio_01_2k.hdr"
     >
     <button id="ar-button" slot="ar-button">Enter AR</button>
 </three-digital-ar>
-<script type="module" src="index.js"></script>
+
   </body>
 </html>

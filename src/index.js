@@ -3,6 +3,38 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
+// import * as THREE from "https://cdn.skypack.dev/three@0.126.0/build/three.module.js";
+// import { GLTFLoader } from "https://cdn.skypack.dev/three@0.126.0/examples/jsm/loaders/GLTFLoader.js";
+// import { RGBELoader } from "https://cdn.skypack.dev/three@0.126.0/examples/jsm/loaders/RGBELoader.js";
+
+
+
+
+var playIcon =  `
+
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<g>
+	<path d="M45.563,29.174l-22-15c-0.307-0.208-0.703-0.231-1.031-0.058C22.205,14.289,22,14.629,22,15v30
+		c0,0.371,0.205,0.711,0.533,0.884C22.679,45.962,22.84,46,23,46c0.197,0,0.394-0.059,0.563-0.174l22-15
+		C45.836,30.64,46,30.331,46,30S45.836,29.36,45.563,29.174z M24,43.107V16.893L43.225,30L24,43.107z"/>
+	<path d="M30,0C13.458,0,0,13.458,0,30s13.458,30,30,30s30-13.458,30-30S46.542,0,30,0z M30,58C14.561,58,2,45.439,2,30
+		S14.561,2,30,2s28,12.561,28,28S45.439,58,30,58z"/>
+</g>
+</svg>
+`
+
+const pauseIcon = `
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve">
+<g>
+	<path d="M30,0C13.458,0,0,13.458,0,30s13.458,30,30,30s30-13.458,30-30S46.542,0,30,0z M30,58C14.561,58,2,45.439,2,30
+		S14.561,2,30,2s28,12.561,28,28S45.439,58,30,58z"/>
+	<path d="M33,46h8V14h-8V46z M35,16h4v28h-4V16z"/>
+	<path d="M19,46h8V14h-8V46z M21,16h4v28h-4V16z"/>
+</g>
+</svg>
+`
 
 const threeDigitalTemplate = document.createElement("template");
 threeDigitalTemplate.innerHTML = `
@@ -48,6 +80,24 @@ threeDigitalTemplate.innerHTML = `
 
 .three-digital-scan {
 }
+.playPauseBtnContainer{
+  position: absolute;
+  bottom: 5em;
+  display: none;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.playPauseBtn{
+  width: 18%;
+  position: absolute;
+  background-color: #dedede12;
+  padding: 0.5em;
+  border-radius: 50%;
+}
+.
+
+
 </style>
 <div class="three-digital-root">
 
@@ -61,8 +111,11 @@ threeDigitalTemplate.innerHTML = `
 
   <div class="three-digital-interactive"> One finger to Drag<br> Two fingers to Rotate and Scale <br> Double Tap scale to 100%</div>
   <div class="three-digital-close-ar ">&#10006;</div>
-</div>
 
+  <div class="playPauseBtnContainer" > 
+<div class="playPauseBtn playBtn">${playIcon}</div>
+</div>
+</div>
 
 <slot id="ar-button" name="ar-button">AR Not Support</slot>
 
@@ -71,6 +124,8 @@ threeDigitalTemplate.innerHTML = `
 class ThreeDigital extends HTMLElement {
   constructor() {
     super();
+
+  
 
     // cutom tag variables
     const self = this;
@@ -93,6 +148,13 @@ class ThreeDigital extends HTMLElement {
     );
     const interactiveInfo = self.shadowRoot.querySelector(
       ".three-digital-interactive"
+    );
+
+    const playBtn = self.shadowRoot.querySelector(
+      ".playBtn"
+    );
+    const playPauseBtnContainer = self.shadowRoot.querySelector(
+      ".playPauseBtnContainer"
     );
     const autoRotation = self.hasAttribute("auto-rotate");
     const enviromentMap = self.hasAttribute("environment-hdr")
@@ -131,13 +193,24 @@ class ThreeDigital extends HTMLElement {
     let currentTouch;
     let reticle;
     let deviceOS;
+    let hasAnimation = false
 
+
+      // animations
+      let mixer;
+      let action;
+      const clock = new THREE.Clock();
+
+      let playing = false
 
     main();
     async function main() {
       const getMobileOS = () => {
         const ua = navigator.userAgent;
-        if (/android/i.test(ua)) {
+
+        console.log(ua)
+
+        if (/android|Mozilla/i.test(ua)) {
           return "Android";
         } else if (
           /iPad|iPhone|iPod/.test(ua) ||
@@ -147,6 +220,8 @@ class ThreeDigital extends HTMLElement {
         }
         return "Other";
       };
+
+
 
       deviceOS = getMobileOS();
 
@@ -190,6 +265,7 @@ class ThreeDigital extends HTMLElement {
       loadingInfo.style.display = "flex";
       enterArButton.style.display = "none";
       interactiveInfo.style.display = "none";
+      playPauseBtnContainer.style.display="none"
 
       canvas = document.createElement("canvas");
       gl = canvas.getContext("webgl", {
@@ -262,6 +338,28 @@ class ThreeDigital extends HTMLElement {
         session.end();
       });
 
+      function regiterPlayEvent(){
+
+
+
+        playBtn.addEventListener("click",()=>{
+
+
+          if(playing){
+            playBtn.innerHTML = playIcon
+
+            playing = !playing
+          } else{
+
+            playBtn.innerHTML = pauseIcon
+            playing = !playing
+          }
+
+        })
+
+
+      }
+
       function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -314,6 +412,27 @@ class ThreeDigital extends HTMLElement {
           rayCasterProxy = new THREE.Mesh(geometry, material);
           rayCasterProxy.position.copy(bboxCenter);
           rayCasterProxy.visible = false;
+
+
+          
+
+          const clips = gltf.animations;
+          console.log(clips)
+
+
+          if (clips.length>0){
+            mixer = new THREE.AnimationMixer(gltf.scene );
+            action = mixer.clipAction( clips[0] )
+
+            
+            action.play();
+
+            regiterPlayEvent()
+            hasAnimation = true
+
+          }
+
+
 
           arScene.add(rayCasterProxy);
           arScene.add(gltf.scene);
@@ -481,6 +600,13 @@ class ThreeDigital extends HTMLElement {
             interactiveInfo.style.display = "block";
             reticle.visible = true;
             if (initialPlace) {
+
+              if(hasAnimation){
+                playPauseBtnContainer.style.display="flex"
+              }
+
+
+
               initialPlace = false;
               placeMode = false;
               loadingInfo.style.display = "none";
@@ -492,6 +618,10 @@ class ThreeDigital extends HTMLElement {
         }
 
         renderer.render(scene, camera);
+
+        const delta = clock.getDelta();
+
+        if(mixer && playing )mixer.update( delta );
 
         if (autoRotation) {
           arScene.rotation.y += 0.01;
